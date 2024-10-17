@@ -1,0 +1,41 @@
+﻿@page "/vehicles"
+@using MoniteringBackend.Models
+@inject MoniteringFrontend.Services.VehicleService VehicleService
+
+<h3>Vehicle List</h3>
+
+@if (vehicles == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Make</th>
+                <th>Model</th>
+                <th>License Plate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehicle in vehicles)
+            {
+                <tr>
+                    <td>@vehicle.Make</td>
+                    <td>@vehicle.Model</td>
+                    <td>@vehicle.LicensePlate</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Vehicle> vehicles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        vehicles = await VehicleService.GetVehiclesAsync();
+    }
+}

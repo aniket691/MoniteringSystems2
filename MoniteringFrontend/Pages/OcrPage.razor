@@ -1,0 +1,56 @@
+﻿@page "/ocr"
+@inject MoniteringFrontend.Services.OcrService OcrService
+
+<h3>OCR Image Upload</h3>
+
+<InputFile OnChange="HandleImageUpload" accept="image/*" />
+<br />
+<button @onclick="ExtractTextFromImage" disabled="@isLoading">Extract Text</button>
+
+@if (isLoading)
+{
+    <p>Processing image... Please wait.</p>
+}
+
+@if (!string.IsNullOrEmpty(ocrResult))
+{
+    <h4>Extracted Text:</h4>
+    <p>@ocrResult</p>
+}
+
+@code {
+    private IBrowserFile selectedImage;
+    private string ocrResult;
+    private bool isLoading;
+
+    private void HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        selectedImage = e.File;
+    }
+
+    private async Task ExtractTextFromImage()
+    {
+        if (selectedImage != null)
+        {
+            isLoading = true;
+            ocrResult = null;
+
+            try
+            {
+                ocrResult = await OcrService.UploadImageAndExtractText(selectedImage);
+            }
+            catch (Exception ex)
+            {
+                ocrResult = $"Error: {ex.Message}";
+            }
+            finally
+            {
+                isLoading = false;
+            }
+        }
+        else
+        {
+            ocrResult = "Please upload an image first.";
+        }
+    }
+}
